@@ -9,12 +9,14 @@ import (
 	logging "github.com/ipfs/go-log"
 	goprocess "github.com/jbenet/goprocess"
 	goprocessctx "github.com/jbenet/goprocess/context"
+	"github.com/libp2p/go-libp2p-core/protocol"
+	"github.com/libp2p/go-libp2p-host"
 	ifconnmgr "github.com/libp2p/go-libp2p-interface-connmgr"
 	inat "github.com/libp2p/go-libp2p-nat"
 	inet "github.com/libp2p/go-libp2p-net"
 	peer "github.com/libp2p/go-libp2p-peer"
 	pstore "github.com/libp2p/go-libp2p-peerstore"
-	protocol "github.com/libp2p/go-libp2p-protocol"
+	proto "github.com/libp2p/go-libp2p-protocol"
 	identify "github.com/libp2p/go-libp2p/p2p/protocol/identify"
 	ping "github.com/libp2p/go-libp2p/p2p/protocol/ping"
 	ma "github.com/multiformats/go-multiaddr"
@@ -71,6 +73,8 @@ type BasicHost struct {
 
 	proc goprocess.Process
 }
+
+var _ host.Host = (*BasicHost)(nil)
 
 // HostOpts holds options that can be passed to NewHost in order to
 // customize construction of the *BasicHost.
@@ -254,7 +258,7 @@ func (h *BasicHost) newStreamHandler(s inet.Stream) {
 		}
 	}
 
-	s.SetProtocol(protocol.ID(protoID))
+	s.SetProtocol(proto.ID(protoID))
 	log.Debugf("protocol negotiation took %s", took)
 
 	go handle(protoID, s)
@@ -282,7 +286,7 @@ func (h *BasicHost) Network() inet.Network {
 }
 
 // Mux returns the Mux multiplexing incoming streams to protocol handlers
-func (h *BasicHost) Mux() *msmux.MultistreamMuxer {
+func (h *BasicHost) Mux() protocol.Switch {
 	return h.mux
 }
 
@@ -295,10 +299,10 @@ func (h *BasicHost) IDService() *identify.IDService {
 // This is equivalent to:
 //   host.Mux().SetHandler(proto, handler)
 // (Threadsafe)
-func (h *BasicHost) SetStreamHandler(pid protocol.ID, handler inet.StreamHandler) {
+func (h *BasicHost) SetStreamHandler(pid proto.ID, handler inet.StreamHandler) {
 	h.Mux().AddHandler(string(pid), func(p string, rwc io.ReadWriteCloser) error {
 		is := rwc.(inet.Stream)
-		is.SetProtocol(protocol.ID(p))
+		is.SetProtocol(proto.ID(p))
 		handler(is)
 		return nil
 	})
@@ -306,25 +310,25 @@ func (h *BasicHost) SetStreamHandler(pid protocol.ID, handler inet.StreamHandler
 
 // SetStreamHandlerMatch sets the protocol handler on the Host's Mux
 // using a matching function to do protocol comparisons
-func (h *BasicHost) SetStreamHandlerMatch(pid protocol.ID, m func(string) bool, handler inet.StreamHandler) {
+func (h *BasicHost) SetStreamHandlerMatch(pid proto.ID, m func(string) bool, handler inet.StreamHandler) {
 	h.Mux().AddHandlerWithFunc(string(pid), m, func(p string, rwc io.ReadWriteCloser) error {
 		is := rwc.(inet.Stream)
-		is.SetProtocol(protocol.ID(p))
+		is.SetProtocol(proto.ID(p))
 		handler(is)
 		return nil
 	})
 }
 
 // RemoveStreamHandler returns ..
-func (h *BasicHost) RemoveStreamHandler(pid protocol.ID) {
+func (h *BasicHost) RemoveStreamHandler(pid proto.ID) {
 	h.Mux().RemoveHandler(string(pid))
 }
 
 // NewStream opens a new stream to given peer p, and writes a p2p/protocol
-// header with given protocol.ID. If there is no connection to p, attempts
+// header with given proto.ID. If there is no connection to p, attempts
 // to create one. If ProtocolID is "", writes no header.
 // (Threadsafe)
-func (h *BasicHost) NewStream(ctx context.Context, p peer.ID, pids ...protocol.ID) (inet.Stream, error) {
+func (h *BasicHost) NewStream(ctx context.Context, p peer.ID, pids ...proto.ID) (inet.Stream, error) {
 	pref, err := h.preferredProtocol(p, pids)
 	if err != nil {
 		return nil, err
@@ -349,14 +353,14 @@ func (h *BasicHost) NewStream(ctx context.Context, p peer.ID, pids ...protocol.I
 		s.Reset()
 		return nil, err
 	}
-	selpid := protocol.ID(selected)
+	selpid := proto.ID(selected)
 	s.SetProtocol(selpid)
 	h.Peerstore().AddProtocols(p, selected)
 
 	return s, nil
 }
 
-func pidsToStrings(pids []protocol.ID) []string {
+func pidsToStrings(pids []proto.ID) []string {
 	out := make([]string, len(pids))
 	for i, p := range pids {
 		out[i] = string(p)
@@ -364,21 +368,21 @@ func pidsToStrings(pids []protocol.ID) []string {
 	return out
 }
 
-func (h *BasicHost) preferredProtocol(p peer.ID, pids []protocol.ID) (protocol.ID, error) {
+func (h *BasicHost) preferredProtocol(p peer.ID, pids []proto.ID) (proto.ID, error) {
 	pidstrs := pidsToStrings(pids)
 	supported, err := h.Peerstore().SupportsProtocols(p, pidstrs...)
 	if err != nil {
 		return "", err
 	}
 
-	var out protocol.ID
+	var out proto.ID
 	if len(supported) > 0 {
-		out = protocol.ID(supported[0])
+		out = proto.ID(supported[0])
 	}
 	return out, nil
 }
 
-func (h *BasicHost) newStream(ctx context.Context, p peer.ID, pid protocol.ID) (inet.Stream, error) {
+func (h *BasicHost) newStream(ctx context.Context, p peer.ID, pid proto.ID) (inet.Stream, error) {
 	s, err := h.Network().NewStream(ctx, p)
 	if err != nil {
 		return nil, err

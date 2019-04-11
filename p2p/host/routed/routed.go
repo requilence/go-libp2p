@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/libp2p/go-libp2p-core/protocol"
 	host "github.com/libp2p/go-libp2p-host"
 
 	logging "github.com/ipfs/go-log"
@@ -14,9 +15,8 @@ import (
 	inet "github.com/libp2p/go-libp2p-net"
 	peer "github.com/libp2p/go-libp2p-peer"
 	pstore "github.com/libp2p/go-libp2p-peerstore"
-	protocol "github.com/libp2p/go-libp2p-protocol"
+	proto "github.com/libp2p/go-libp2p-protocol"
 	ma "github.com/multiformats/go-multiaddr"
-	msmux "github.com/multiformats/go-multistream"
 )
 
 var log = logging.Logger("routedhost")
@@ -149,23 +149,23 @@ func (rh *RoutedHost) Network() inet.Network {
 	return rh.host.Network()
 }
 
-func (rh *RoutedHost) Mux() *msmux.MultistreamMuxer {
+func (rh *RoutedHost) Mux() protocol.Switch {
 	return rh.host.Mux()
 }
 
-func (rh *RoutedHost) SetStreamHandler(pid protocol.ID, handler inet.StreamHandler) {
+func (rh *RoutedHost) SetStreamHandler(pid proto.ID, handler inet.StreamHandler) {
 	rh.host.SetStreamHandler(pid, handler)
 }
 
-func (rh *RoutedHost) SetStreamHandlerMatch(pid protocol.ID, m func(string) bool, handler inet.StreamHandler) {
+func (rh *RoutedHost) SetStreamHandlerMatch(pid proto.ID, m func(string) bool, handler inet.StreamHandler) {
 	rh.host.SetStreamHandlerMatch(pid, m, handler)
 }
 
-func (rh *RoutedHost) RemoveStreamHandler(pid protocol.ID) {
+func (rh *RoutedHost) RemoveStreamHandler(pid proto.ID) {
 	rh.host.RemoveStreamHandler(pid)
 }
 
-func (rh *RoutedHost) NewStream(ctx context.Context, p peer.ID, pids ...protocol.ID) (inet.Stream, error) {
+func (rh *RoutedHost) NewStream(ctx context.Context, p peer.ID, pids ...proto.ID) (inet.Stream, error) {
 	// Ensure we have a connection, with peer addresses resolved by the routing system (#207)
 	// It is not sufficient to let the underlying host connect, it will most likely not have
 	// any addresses for the peer without any prior connections.
