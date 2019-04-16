@@ -46,5 +46,3 @@ require (
 	github.com/whyrusleeping/go-smux-yamux v2.0.9+incompatible
 	github.com/whyrusleeping/mdns v0.0.0-20180901202407-ef14215e6b30
 )
-
-go 1.11
