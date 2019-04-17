@@ -12,7 +12,7 @@ require (
 	github.com/libp2p/go-libp2p-autonat v0.0.4
 	github.com/libp2p/go-libp2p-blankhost v0.0.1
 	github.com/libp2p/go-libp2p-circuit v0.0.4
-	github.com/libp2p/go-libp2p-core v0.0.0-20190416150442-54a1b70f07da
+	github.com/libp2p/go-libp2p-core v0.0.0-20190417155812-74fe43be2428
 	github.com/libp2p/go-libp2p-crypto v0.0.1
 	github.com/libp2p/go-libp2p-discovery v0.0.2
 	github.com/libp2p/go-libp2p-host v0.0.3-0.20190416173127-81c5d8f5ec61
@@ -24,7 +24,7 @@ require (
 	github.com/libp2p/go-libp2p-net v0.0.3-0.20190416173142-4f87c29c71c7
 	github.com/libp2p/go-libp2p-netutil v0.0.1
 	github.com/libp2p/go-libp2p-peer v0.1.1-0.20190416173146-95d290e625d3
-	github.com/libp2p/go-libp2p-peerstore v0.0.2
+	github.com/libp2p/go-libp2p-peerstore v0.0.3-0.20190417110437-16f2400da407
 	github.com/libp2p/go-libp2p-protocol v0.0.1
 	github.com/libp2p/go-libp2p-routing v0.0.1
 	github.com/libp2p/go-libp2p-secio v0.0.1
