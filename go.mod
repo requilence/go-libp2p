@@ -2,40 +2,36 @@ module github.com/libp2p/go-libp2p
 
 require (
 	github.com/gogo/protobuf v1.2.1
+	github.com/gorilla/websocket v1.4.0 // indirect
+	github.com/hashicorp/go-multierror v1.0.0 // indirect
 	github.com/ipfs/go-cid v0.0.1
 	github.com/ipfs/go-detect-race v0.0.1
 	github.com/ipfs/go-ipfs-util v0.0.1
 	github.com/ipfs/go-log v0.0.1
+	github.com/jbenet/go-temp-err-catcher v0.0.0-20150120210811-aac704a3f4f2 // indirect
 	github.com/jbenet/goprocess v0.0.0-20160826012719-b497e2f366b8
-	github.com/libp2p/go-conn-security v0.0.1
-	github.com/libp2p/go-conn-security-multistream v0.0.1
-	github.com/libp2p/go-libp2p-autonat v0.0.4
-	github.com/libp2p/go-libp2p-blankhost v0.0.1
-	github.com/libp2p/go-libp2p-circuit v0.0.4
-	github.com/libp2p/go-libp2p-core v0.0.0-20190417155812-74fe43be2428
+	github.com/libp2p/go-addr-util v0.0.1 // indirect
+	github.com/libp2p/go-flow-metrics v0.0.1 // indirect
+	github.com/libp2p/go-libp2p-core v0.0.0-20190417162149-f41b5dd7c01b
 	github.com/libp2p/go-libp2p-crypto v0.0.1
-	github.com/libp2p/go-libp2p-discovery v0.0.2
-	github.com/libp2p/go-libp2p-host v0.0.3-0.20190416173127-81c5d8f5ec61
-	github.com/libp2p/go-libp2p-interface-connmgr v0.0.4-0.20190416173131-bd0c2e3df76e
+	github.com/libp2p/go-libp2p-host v0.0.3-0.20190417163130-3dbb8ff97068
+	github.com/libp2p/go-libp2p-interface-connmgr v0.0.4-0.20190417163148-042f06a9d500
 	github.com/libp2p/go-libp2p-interface-pnet v0.0.1
 	github.com/libp2p/go-libp2p-loggables v0.0.1
-	github.com/libp2p/go-libp2p-metrics v0.0.1
 	github.com/libp2p/go-libp2p-nat v0.0.3
-	github.com/libp2p/go-libp2p-net v0.0.3-0.20190416173142-4f87c29c71c7
+	github.com/libp2p/go-libp2p-net v0.0.3-0.20190417163222-435e3f738c44
 	github.com/libp2p/go-libp2p-netutil v0.0.1
-	github.com/libp2p/go-libp2p-peer v0.1.1-0.20190416173146-95d290e625d3
-	github.com/libp2p/go-libp2p-peerstore v0.0.3-0.20190417110437-16f2400da407
-	github.com/libp2p/go-libp2p-protocol v0.0.1
+	github.com/libp2p/go-libp2p-peer v0.1.1-0.20190417163254-bc123512eacd
+	github.com/libp2p/go-libp2p-peerstore v0.0.3-0.20190417163308-393cab16de63
+	github.com/libp2p/go-libp2p-protocol v0.0.0-20190417164323-90214444c101 // indirect
 	github.com/libp2p/go-libp2p-routing v0.0.1
-	github.com/libp2p/go-libp2p-secio v0.0.1
-	github.com/libp2p/go-libp2p-swarm v0.0.2
-	github.com/libp2p/go-libp2p-transport v0.0.4
-	github.com/libp2p/go-libp2p-transport-upgrader v0.0.1
+	github.com/libp2p/go-libp2p-transport v0.0.5-0.20190417163604-3e2e98c6fda1
 	github.com/libp2p/go-maddr-filter v0.0.1
+	github.com/libp2p/go-mplex v0.0.1 // indirect
+	github.com/libp2p/go-msgio v0.0.1 // indirect
+	github.com/libp2p/go-reuseport-transport v0.0.2 // indirect
 	github.com/libp2p/go-stream-muxer v0.0.1
-	github.com/libp2p/go-tcp-transport v0.0.2
 	github.com/libp2p/go-testutil v0.0.1
-	github.com/libp2p/go-ws-transport v0.0.2
 	github.com/miekg/dns v1.1.8 // indirect
 	github.com/multiformats/go-multiaddr v0.0.2
 	github.com/multiformats/go-multiaddr-dns v0.0.2
@@ -45,4 +41,6 @@ require (
 	github.com/whyrusleeping/go-smux-multistream v2.0.2+incompatible
 	github.com/whyrusleeping/go-smux-yamux v2.0.9+incompatible
 	github.com/whyrusleeping/mdns v0.0.0-20180901202407-ef14215e6b30
+	github.com/whyrusleeping/multiaddr-filter v0.0.0-20160516205228-e903e4adabd7 // indirect
+	github.com/whyrusleeping/yamux v1.1.5 // indirect
 )
