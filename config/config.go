@@ -3,6 +3,8 @@ package config
 import (
 	"context"
 	"fmt"
+	"reflect"
+	"runtime"
 
 	bhost "github.com/libp2p/go-libp2p/p2p/host/basic"
 	relay "github.com/libp2p/go-libp2p/p2p/host/relay"
@@ -75,6 +77,7 @@ type Config struct {
 // This function consumes the config. Do not reuse it (really!).
 func (cfg *Config) NewNode(ctx context.Context) (host.Host, error) {
 	// Check this early. Prevents us from even *starting* without verifying this.
+	fmt.Printf("%+v\n\n", *cfg)
 	if pnet.ForcePrivateNetwork && cfg.Protector == nil {
 		log.Error("tried to create a libp2p node with no Private" +
 			" Network Protector but usage of Private Networks" +
@@ -244,7 +247,11 @@ type Option func(cfg *Config) error
 // Apply applies the given options to the config, returning the first error
 // encountered (if any).
 func (cfg *Config) Apply(opts ...Option) error {
+	fmt.Printf("Apply Config opts(%d)...\n", len(opts))
+
 	for _, opt := range opts {
+
+		fmt.Printf("Apply %s\n", runtime.FuncForPC(reflect.ValueOf(opt).Pointer()).Name())
 		if opt == nil {
 			continue
 		}

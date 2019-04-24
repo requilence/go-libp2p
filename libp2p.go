@@ -2,8 +2,9 @@ package libp2p
 
 import (
 	"context"
+	"fmt"
 
-	config "github.com/libp2p/go-libp2p/config"
+	"github.com/libp2p/go-libp2p/config"
 
 	host "github.com/libp2p/go-libp2p-host"
 )
@@ -65,6 +66,7 @@ func New(ctx context.Context, opts ...Option) (host.Host, error) {
 // opt-out of any defaults we may provide.
 func NewWithoutDefaults(ctx context.Context, opts ...Option) (host.Host, error) {
 	var cfg Config
+	fmt.Printf("NewWithoutDefaults %d options\n", len(opts))
 	if err := cfg.Apply(opts...); err != nil {
 		return nil, err
 	}
