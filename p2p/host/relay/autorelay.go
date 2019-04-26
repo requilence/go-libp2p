@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
+	"strings"
 	"sync"
 	"time"
 
@@ -279,6 +280,7 @@ func (ar *AutoRelay) relayAddrs(addrs []ma.Multiaddr) []ma.Multiaddr {
 		}
 	}
 
+	log.Debugf("relayAddrs %d relay peers", len(relays))
 	return raddrs
 }
 
@@ -292,7 +294,40 @@ func shuffleRelays(pis []pstore.PeerInfo) {
 // Notifee
 func (ar *AutoRelay) Listen(inet.Network, ma.Multiaddr)      {}
 func (ar *AutoRelay) ListenClose(inet.Network, ma.Multiaddr) {}
-func (ar *AutoRelay) Connected(inet.Network, inet.Conn)      {}
+func (ar *AutoRelay) Connected(_ inet.Network, c inet.Conn) {
+	p := c.RemotePeer()
+	log.Debugf("AutoRelayHost.Connected %s", p.Pretty())
+
+	go func() {
+		// wait some time to populate tags
+		time.Sleep(time.Second * 5)
+		tags := ar.host.ConnManager().GetTagInfo(p)
+		if tags == nil {
+			return
+		}
+
+		for tag, count := range tags.Tags {
+			if tag == "relay-hop" {
+				log.Debugf("AutoRelayHost.Connected %s: %s %d", p.Pretty(), tag, count)
+
+				ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+				defer cancel()
+				_, err := ar.router.FindPeer(ctx, p)
+				if err != nil {
+					log.Debugf("AutoRelayHost router.FindPeer error: %s", err.Error())
+					return
+				}
+				ar.host.ConnManager().TagPeer(p, "relay", 42)
+
+				ar.mx.Lock()
+				ar.relays[p] = struct{}{}
+				ar.mx.Unlock()
+
+				return
+			}
+		}
+	}()
+}
 
 func (ar *AutoRelay) Disconnected(net inet.Network, c inet.Conn) {
 	p := c.RemotePeer()
@@ -304,6 +339,7 @@ func (ar *AutoRelay) Disconnected(net inet.Network, c inet.Conn) {
 		// We have a second connection.
 		return
 	}
+	log.Debugf("AutoRelayHost.Disconnected %s", p.Pretty())
 
 	if _, ok := ar.relays[p]; ok {
 		delete(ar.relays, p)
