@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
-	"strings"
 	"sync"
 	"time"
 
@@ -27,8 +26,8 @@ const (
 
 var (
 	DesiredRelays = 3
-
-	BootDelay = 20 * time.Second
+	BootDelay     = 20 * time.Second
+	relaysNumber  = 0
 )
 
 // AutoRelay is a Host that uses relays for connectivity when a NAT is detected.
@@ -280,7 +279,10 @@ func (ar *AutoRelay) relayAddrs(addrs []ma.Multiaddr) []ma.Multiaddr {
 		}
 	}
 
-	log.Debugf("relayAddrs %d relay peers", len(relays))
+	if relaysNumber != len(relays) {
+		log.Debugf("relayAddrs %d relay peers", len(relays))
+		relaysNumber = len(relays)
+	}
 	return raddrs
 }
 
