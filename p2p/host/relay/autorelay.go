@@ -306,7 +306,38 @@ func shuffleRelays(pis []pstore.PeerInfo) {
 // Notifee
 func (ar *AutoRelay) Listen(inet.Network, ma.Multiaddr)      {}
 func (ar *AutoRelay) ListenClose(inet.Network, ma.Multiaddr) {}
-func (ar *AutoRelay) Connected(inet.Network, inet.Conn)      {}
+func (ar *AutoRelay) Connected(_ inet.Network, c inet.Conn) {
+	p := c.RemotePeer()
+
+	go func() {
+		// wait some time to populate tags
+		time.Sleep(time.Second * 5)
+		tags := ar.host.ConnManager().GetTagInfo(p)
+		if tags == nil {
+			return
+		}
+
+		for tag, _ := range tags.Tags {
+			if tag == "relay-hop" {
+				ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+				defer cancel()
+				_, err := ar.router.FindPeer(ctx, p)
+				if err != nil {
+					log.Debugf("AutoRelayHost router.FindPeer error: %s", err.Error())
+					return
+				}
+
+				ar.host.ConnManager().TagPeer(p, "relay", 42)
+
+				ar.mx.Lock()
+				ar.relays[p] = struct{}{}
+				ar.mx.Unlock()
+
+				return
+			}
+		}
+	}()
+}
 
 func (ar *AutoRelay) Disconnected(net inet.Network, c inet.Conn) {
 	p := c.RemotePeer()
